@@ -13,7 +13,7 @@ namespace Summator
                 Console.Write("Введите второе число: ");
                 var int2 = int.Parse(Console.ReadLine());
 
-                var summator = new Summator();
+                var summator = new Summator(new Logger());
 
                 Console.WriteLine($"Сумма: {summator.Sum(int1, int2)}");
             }
@@ -28,9 +28,44 @@ namespace Summator
 
     public class Summator : ISum
     {
+        private ILogger logger;
+
+        public Summator(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
         public int Sum(int a, int b)
         {
-            return checked(a + b);
+            try
+            {
+                logger.EventLog($"Сложение чисел {a} и {b}");
+                return checked(a + b);
+            }
+            catch(Exception exception)
+            {
+                logger.ErrorLog(exception.Message);
+                return 0;
+            }
+        }
+    }
+
+    public class Logger : ILogger
+    {
+        public void ErrorLog(string message)
+        {
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ForegroundColor = defaultColor;
+        }
+
+        public void EventLog(string message)
+        {
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine(message);
+            Console.ForegroundColor = defaultColor;
         }
     }
 }
